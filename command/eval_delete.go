@@ -177,7 +177,7 @@ func (e *EvalDeleteCommand) Run(args []string) int {
 	// influence this.
 	var exitCode int
 
-	// Call the correct function in order to handle to operator input
+	// Call the correct function in order to handle the operator input
 	// correctly.
 	switch len(args) {
 	case 1:
@@ -208,13 +208,11 @@ func (e *EvalDeleteCommand) Run(args []string) int {
 	// Always attempt to revert the state of the eval broker. In the event this
 	// succeeds, but the eval deletion failed, maintain the non-zero exit code
 	// so failures are clear.
-	return func(exitCode int) int {
-		if err := e.revertEvalBroker(); err != nil {
-			e.Ui.Error(fmt.Sprintf("Error reverting eval broker state: %s", err))
-			exitCode = 1
-		}
-		return exitCode
-	}(exitCode)
+	if err := e.revertEvalBroker(); err != nil {
+		e.Ui.Error(fmt.Sprintf("Error reverting eval broker state: %s", err))
+		exitCode = 1
+	}
+	return exitCode
 }
 
 // verifyArgsAndFlags ensures the passed arguments and flags are valid for what
@@ -288,7 +286,7 @@ func (e *EvalDeleteCommand) revertEvalBroker() error {
 
 	// If the broker is paused, and it was paused before this command was
 	// invoked, there is nothing else to do.
-	if e.originalBrokerPaused == schedulerConfig.SchedulerConfig.PauseEvalBroker {
+	if schedulerConfig.SchedulerConfig.PauseEvalBroker && e.originalBrokerPaused {
 		return nil
 	}
 
@@ -319,26 +317,25 @@ func (e *EvalDeleteCommand) handleEvalArgDelete(evalID string) (int, error) {
 
 // handleFlagFilterDelete handles deletion of evaluations discovered using
 // filter flags. It is unknown how many will match the operator criteria so
-// this function ensure to batch lookup and delete requests into sensible
-// numbers.
+// this function batches lookup and delete requests into sensible numbers.
 //
 // The function is recursive and will run until it has found and deleted all
 // evals which matched the criteria. It is possible for a batch of evals to be
-// deleted, but a subsequent call to fail to due temporary issues. This is fine
-// and safe can the command can be re-run if this occurs.
+// deleted, but a subsequent call may fail due to temporary issues. The command
+// is idempotent and may be re-run safely if this occurs.
 func (e *EvalDeleteCommand) handleFlagFilterDelete(nextToken, filter string) (int, error) {
 
 	// Generate the query options using the passed next token and filter. The
 	// per page value is less than the total number we can include in a single
-	// delete request. This allows us to keep the maximum return object of the
-	// eval list call to fairly small.
+	// delete request. This keeps the maximum size of the return object at a
+	// reasonable size.
 	//
 	// The JSON serialized evaluation API object is 350-380B in size.
 	// 2426 * 380B (3.8e-4 MB) = 0.92MB. We may want to make this configurable
 	// in the future, but this is counteracted by the CLI logic which will loop
 	// until the user tells it to exit, or all evals matching the filter are
 	// deleted. 2426 * 3 falls below the maximum limit for eval IDs in a single
-	// delete request.
+	// delete request (set by MaxEvalIDsPerDeleteRequest).
 	opts := &api.QueryOptions{
 		Filter:    filter,
 		PerPage:   2426,
@@ -347,9 +344,8 @@ func (e *EvalDeleteCommand) handleFlagFilterDelete(nextToken, filter string) (in
 
 	var evalsToDelete []*api.Evaluation
 
-	// Iterate 3 times, so we have a maximum size of eval IDs to delete in a
-	// single go, but don't perform a large single eval listing in a single
-	// call.
+	// Call List 3 times to accumulate the maximum number if eval IDs supported
+	// in a single Delete request. See math above.
 	for i := 0; i < 3; i++ {
 
 		evalList, meta, err := e.client.Evaluations().List(opts)

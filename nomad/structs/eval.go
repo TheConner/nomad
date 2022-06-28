@@ -10,7 +10,7 @@ const (
 )
 
 // EvalDeleteRequest is the request object used when operators are manually
-// deleting evaluations. The number of evaluations IDs within the request must
+// deleting evaluations. The number of evaluation IDs within the request must
 // not be greater than MaxEvalIDsPerDeleteRequest.
 type EvalDeleteRequest struct {
 	EvalIDs []string

@@ -822,9 +822,11 @@ type EvalUpdateRequest struct {
 	WriteRequest
 }
 
-// EvalReapRequest is used for reaping evaluations and allocation. This action
-// is performed by the core scheduler which is periodic, or manually by
-// operators using the eval delete RPC.
+// EvalReapRequest is used for reaping evaluations and allocation. This struct
+// is used by the Eval.Reap RPC endpoint as a request argument, and also when
+// performing eval reap or deletes via Raft. This is because Eval.Reap and
+// Eval.Delete use the same Raft message when performing deletes so we do not
+// need more Raft message types.
 type EvalReapRequest struct {
 	Evals  []string
 	Allocs []string

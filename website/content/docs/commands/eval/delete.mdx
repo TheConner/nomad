@@ -10,7 +10,7 @@ The eval delete command is used to delete evaluations.
 The `eval delete` command is used to delete evaluations. It should be used
 cautiously and only in outage situations where there is a large backlog of
 evaluations not being processed. During most normal and outage scenarios,
-Nomads reconciliation and state management will handle evaluations as needed.
+Nomad's reconciliation and state management will handle evaluations as needed.
 
 ## Usage
 
@@ -30,10 +30,10 @@ When ACLs are enabled, this command requires a `management` token.
 
 ## Delete Options
 
-- `-scheduler`: Filter by scheduler type (one of "batch", "service", "system",
-  or "sysbatch"). This option may be specified multiple times.
+- `-scheduler`: Filter by scheduler type (one of `batch`, `service`, `system`,
+  or `sysbatch`). This option may be specified multiple times.
 
-- `-status`: Filter by eval status (one of "blocked", "pending", "complete",
+- `-status`: Filter by eval status (one of `blocked`, `pending`, `complete`,
   "failed", or "canceled"). This option may be specified multiple times.
 
 - `-job`: Filter by an associated job ID. This option may be specified multiple
@@ -46,7 +46,7 @@ When ACLs are enabled, this command requires a `management` token.
   times.
 
 - `-filter-operator`: The filter operator to use when multiple filter options are
-  specified. This defaults to "and" but also supports "or".
+  specified. This defaults to `and` but also supports `or`.
 
 - `-yes`: Bypass the confirmation prompt if an evaluation ID was not provided.
 

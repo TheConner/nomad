@@ -157,7 +157,7 @@ func TestEvaluations_Delete(t *testing.T) {
 	// should return an error.
 	wm, err := testClient.Evaluations().Delete([]string{"8E231CF4-CA48-43FF-B694-5801E69E22FA"}, nil)
 	require.Nil(t, wm)
-	require.Contains(t, err.Error(), "eval broker is enabled")
+	require.ErrorContains(t, err, "eval broker is enabled")
 
 	// Pause the eval broker, and try to delete an evaluation that does not
 	// exist.
@@ -171,7 +171,7 @@ func TestEvaluations_Delete(t *testing.T) {
 	require.True(t, schedulerConfigUpdated.Updated)
 
 	wm, err = testClient.Evaluations().Delete([]string{"8E231CF4-CA48-43FF-B694-5801E69E22FA"}, nil)
-	require.Contains(t, err.Error(), "eval not found")
+	require.ErrorContains(t, err, "eval not found")
 }
 
 func TestEvaluations_Allocations(t *testing.T) {

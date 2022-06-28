@@ -167,7 +167,7 @@ func TestHTTP_EvalsDelete(t *testing.T) {
 					obj, err := s.Server.EvalsRequest(respW, req)
 					require.Equal(t,
 						CodedError(http.StatusBadRequest,
-							"request includes 8000 evaluations IDs, should be 7281 or below"), err)
+							"request includes 8000 evaluations IDs, must be 7281 or fewer"), err)
 					require.Nil(t, obj)
 				})
 			},

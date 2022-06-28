@@ -108,7 +108,7 @@ func TestRequestTime(t *testing.T) {
 		t.Errorf("bad request time: %d", wm.RequestTime)
 	}
 
-	wm, err = client.delete("/", &out, nil, nil)
+	wm, err = client.delete("/", nil, &out, nil)
 	if err != nil {
 		t.Fatalf("delete err: %v", err)
 	}

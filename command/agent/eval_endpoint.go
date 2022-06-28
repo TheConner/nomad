@@ -51,7 +51,7 @@ func (s *HTTPServer) evalsDeleteRequest(resp http.ResponseWriter, req *http.Requ
 	var args structs.EvalDeleteRequest
 
 	if err := decodeBody(req, &args); err != nil {
-		return nil, CodedError(http.StatusInternalServerError, err.Error())
+		return nil, CodedError(http.StatusBadRequest, err.Error())
 	}
 
 	numIDs := len(args.EvalIDs)
@@ -62,7 +62,7 @@ func (s *HTTPServer) evalsDeleteRequest(resp http.ResponseWriter, req *http.Requ
 		return nil, CodedError(http.StatusBadRequest, "request does not include any evaluation IDs")
 	} else if numIDs > structs.MaxUUIDsPerWriteRequest {
 		return nil, CodedError(http.StatusBadRequest, fmt.Sprintf(
-			"request includes %v evaluations IDs, should be %v or below",
+			"request includes %v evaluations IDs, must be %v or fewer",
 			numIDs, structs.MaxUUIDsPerWriteRequest))
 	}
 

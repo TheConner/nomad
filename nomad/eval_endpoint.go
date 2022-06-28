@@ -440,7 +440,7 @@ func (e *Eval) Delete(
 	// The eval broker must be disabled otherwise Nomad's state will likely get
 	// wild in a very un-fun way.
 	if e.srv.evalBroker.Enabled() {
-		return errors.New("eval broker is enabled")
+		return errors.New("eval broker is enabled; eval broker must be paused to delete evals")
 	}
 
 	// Grab the state snapshot, so we can look up relevant eval information.

@@ -41,11 +41,11 @@ func (e *Evaluations) Info(evalID string, q *QueryOptions) (*Evaluation, *QueryM
 }
 
 // Delete is used to batch delete evaluations using their IDs.
-func (e *Evaluations) Delete(evalIDs []string, q *WriteOptions) (*WriteMeta, error) {
+func (e *Evaluations) Delete(evalIDs []string, w *WriteOptions) (*WriteMeta, error) {
 	req := EvalDeleteRequest{
 		EvalIDs: evalIDs,
 	}
-	wm, err := e.client.delete("/v1/evaluations", &req, nil, q)
+	wm, err := e.client.delete("/v1/evaluations", &req, nil, w)
 	if err != nil {
 		return nil, err
 	}

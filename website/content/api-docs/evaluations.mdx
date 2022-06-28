@@ -213,7 +213,7 @@ endpoint.
 
 This API endpoint should be used cautiously and only in outage situations where
 there is a large backlog of evaluations not being processed. During most normal
-and outage scenarios, Nomads reconciliation and state management will handle
+and outage scenarios, Nomad's reconciliation and state management will handle
 evaluations as needed.
 
 | Method    | Path              | Produces           |
@@ -230,8 +230,8 @@ The table below shows this endpoint's support for
 
 ### Parameters
 
-- `:EvalIDs` `(array<string>: <required>)`- An array of evaluation UUIDs to
-  delete. This must be the full UUID, not the short 8-character one.
+- `EvalIDs` `(array<string>: <required>)`- An array of evaluation UUIDs to
+  delete. This must be a full length UUID and not a prefix.
 
 ### Sample Payload
 

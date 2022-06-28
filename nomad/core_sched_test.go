@@ -1915,7 +1915,6 @@ func TestCoreScheduler_PartitionDeploymentReap(t *testing.T) {
 }
 
 func TestCoreScheduler_PartitionJobReap(t *testing.T) {
-	ci.Parallel(t)
 
 	s1, cleanupS1 := TestServer(t, nil)
 	defer cleanupS1()
@@ -1929,7 +1928,11 @@ func TestCoreScheduler_PartitionJobReap(t *testing.T) {
 	core := NewCoreScheduler(s1, snap)
 
 	// Set the max ids per reap to something lower.
+	originalMaxUUIDsPerWriteRequest := structs.MaxUUIDsPerWriteRequest
 	structs.MaxUUIDsPerWriteRequest = 2
+	defer func() {
+		structs.MaxUUIDsPerWriteRequest = originalMaxUUIDsPerWriteRequest
+	}()
 
 	jobs := []*structs.Job{mock.Job(), mock.Job(), mock.Job()}
 	requests := core.(*CoreScheduler).partitionJobReap(jobs, "")
