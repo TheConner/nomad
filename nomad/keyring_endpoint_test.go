@@ -29,7 +29,7 @@ func TestKeyringEndpoint_CRUD(t *testing.T) {
 	key, err := structs.NewRootKey(structs.EncryptionAlgorithmAES256GCM)
 	require.NoError(t, err)
 	id := key.Meta.KeyID
-	key.Meta.Active = true
+	key.Meta.SetActive()
 
 	updateReq := &structs.KeyringUpdateRootKeyRequest{
 		RootKey:      key,
@@ -104,7 +104,7 @@ func TestKeyringEndpoint_CRUD(t *testing.T) {
 	require.EqualError(t, err, "active root key cannot be deleted - call rotate first")
 
 	// set inactive
-	updateReq.RootKey.Meta.Active = false
+	updateReq.RootKey.Meta.SetInactive()
 	err = msgpackrpc.CallWithCodec(codec, "Keyring.Update", updateReq, &updateResp)
 	require.NoError(t, err)
 
@@ -137,7 +137,7 @@ func TestKeyringEndpoint_InvalidUpdates(t *testing.T) {
 	key, err := structs.NewRootKey(structs.EncryptionAlgorithmAES256GCM)
 	require.NoError(t, err)
 	id := key.Meta.KeyID
-	key.Meta.Active = true
+	key.Meta.SetActive()
 
 	updateReq := &structs.KeyringUpdateRootKeyRequest{
 		RootKey: key,
@@ -216,7 +216,7 @@ func TestKeyringEndpoint_Rotate(t *testing.T) {
 	// Setup an existing key
 	key, err := structs.NewRootKey(structs.EncryptionAlgorithmAES256GCM)
 	require.NoError(t, err)
-	key.Meta.Active = true
+	key.Meta.SetActive()
 
 	updateReq := &structs.KeyringUpdateRootKeyRequest{
 		RootKey: key,
@@ -263,9 +263,9 @@ func TestKeyringEndpoint_Rotate(t *testing.T) {
 
 	for _, keyMeta := range listResp.Keys {
 		if keyMeta.KeyID != newID {
-			require.False(t, keyMeta.Active, "expected old keys to be inactive")
+			require.False(t, keyMeta.Active(), "expected old keys to be inactive")
 		} else {
-			require.True(t, keyMeta.Active, "expected new key to be inactive")
+			require.True(t, keyMeta.Active(), "expected new key to be inactive")
 		}
 	}
 
